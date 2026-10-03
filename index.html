@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>PlaceReady – Placement Preparation Portal</title>
+<style>
+:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);
+--bg:#f6f7fb;--card:#fff;--text:#1c2033;--muted:#5d6480;--accent:#4f46e5;--accent2:#e0e7ff;--ok:#16a34a;--bad:#dc2626;--line:#e3e6f0}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#12141f;--card:#1c2030;--text:#eceefa;--muted:#a3a9c6;--accent:#8b85ff;--accent2:#2a2f4d;--line:#2c3150}}
+:root[data-theme="dark"]{--bg:#12141f;--card:#1c2030;--text:#eceefa;--muted:#a3a9c6;--accent:#8b85ff;--accent2:#2a2f4d;--line:#2c3150}
+html{scroll-behavior:smooth;scroll-padding-top:calc(64px + env(safe-area-inset-top,0px))}
+*,*::before,*::after{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;line-height:1.6}
+header{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--card);border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;padding:12px 20px;gap:12px;flex-wrap:wrap}
+.logo{font-weight:800;font-size:1.2rem;color:var(--accent)}
+nav{display:flex;gap:16px;flex-wrap:wrap;align-items:center}
+nav a{color:var(--text);text-decoration:none;font-size:.92rem}
+nav a:hover{color:var(--accent)}
+button{font:inherit;cursor:pointer;border:0;border-radius:8px;padding:9px 16px;background:var(--accent);color:#fff}
+button.ghost{background:var(--accent2);color:var(--text)}
+section{max-width:960px;margin:0 auto;padding:48px 20px}
+h2{margin:0 0 6px;font-size:1.6rem}
+.sub{color:var(--muted);margin:0 0 22px}
+.hero{text-align:center;padding-top:64px}
+.hero h1{font-size:clamp(1.9rem,5vw,3rem);margin:0 0 10px}
+.hero p{color:var(--muted);max-width:560px;margin:0 auto 22px}
+.stats{display:flex;gap:14px;justify-content:center;flex-wrap:wrap;margin-top:30px}
+.stat{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px 22px}
+.stat b{display:block;font-size:1.5rem;color:var(--accent)}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:20px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:14px}
+.tag{display:inline-block;font-size:.75rem;background:var(--accent2);border-radius:99px;padding:2px 10px;margin-bottom:6px}
+.chips{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px}
+.chip.active{background:var(--accent);color:#fff}
+.bar{height:10px;background:var(--accent2);border-radius:9px;overflow:hidden;margin:8px 0 16px}
+.bar i{display:block;height:100%;width:0;background:var(--ok);transition:width .3s}
+label.task{display:flex;gap:10px;padding:9px 0;border-bottom:1px solid var(--line);cursor:pointer}
+.opt{display:block;width:100%;text-align:left;margin:6px 0;background:var(--accent2);color:var(--text)}
+.opt.right{background:var(--ok);color:#fff}.opt.wrong{background:var(--bad);color:#fff}
+details{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:12px 16px;margin-bottom:10px}
+summary{cursor:pointer;font-weight:600}
+input,textarea{width:100%;padding:10px;border-radius:8px;border:1px solid var(--line);background:var(--card);color:var(--text);font:inherit;margin-bottom:10px}
+.msg{font-size:.9rem;min-height:1.2em}
+.err{color:var(--bad)}.good{color:var(--ok)}
+footer{text-align:center;color:var(--muted);padding:30px 20px;font-size:.9rem}
+ol.prompts li{margin-bottom:6px}
+</style>
+</head>
+<body>
+<header>
+  <div class="logo">🎯 PlaceReady</div>
+  <nav>
+    <a href="#home">Home</a><a href="#quiz">Quiz</a><a href="#tracker">Tracker</a>
+    <a href="#resources">Resources</a><a href="#faq">Interview Tips</a><a href="#contact">Contact</a><a href="#ai">AI Log</a>
+    <button class="ghost" id="themeBtn" aria-label="Toggle theme">🌓</button>
+  </nav>
+</header>
+
+<section id="home" class="hero">
+  <h1>Crack your campus placements</h1>
+  <p>Practice aptitude questions, track your preparation, and find the best resources for coding, aptitude and HR rounds.</p>
+  <button onclick="location.hash='#quiz'">Start Practice Quiz</button>
+  <div class="stats">
+    <div class="stat"><b id="stQuiz">–</b>Best quiz score</div>
+    <div class="stat"><b id="stTask">0%</b>Prep completed</div>
+    <div class="stat"><b id="stRes">8</b>Resources</div>
+  </div>
+</section>
+
+<section id="quiz">
+  <h2>Aptitude Quiz</h2>
+  <p class="sub">5 quick questions. Pick an answer to get instant feedback.</p>
+  <div class="card" id="quizBox"></div>
+</section>
+
+<section id="tracker">
+  <h2>Preparation Tracker</h2>
+  <p class="sub">Tick tasks as you finish them. Progress is saved in your browser.</p>
+  <div class="card">
+    <b id="pct">0% done</b>
+    <div class="bar"><i id="fill"></i></div>
+    <div id="tasks"></div>
+    <button class="ghost" style="margin-top:14px" id="resetTasks">Reset</button>
+  </div>
+</section>
+
+<section id="resources">
+  <h2>Resource Library</h2>
+  <p class="sub">Filter by category or search by keyword.</p>
+  <input id="search" placeholder="Search resources…" aria-label="Search resources">
+  <div class="chips" id="chips"></div>
+  <div class="grid" id="resGrid"></div>
+</section>
+
+<section id="faq">
+  <h2>Interview Tips</h2>
+  <p class="sub">Tap a question to expand.</p>
+  <details><summary>How do I answer "Tell me about yourself"?</summary><p>Use a 60-second structure: present (course, skills), past (projects, internships), future (why this role). Avoid reciting your resume.</p></details>
+  <details><summary>How should I prepare for coding rounds?</summary><p>Master arrays, strings, hashing, recursion and basic DP. Solve 2 problems daily and practice explaining your approach aloud.</p></details>
+  <details><summary>What should my resume contain?</summary><p>One page, 2–3 strong projects with measurable outcomes, skills, and links to GitHub or portfolio. Keep formatting clean.</p></details>
+  <details><summary>How do I handle a question I don't know?</summary><p>Stay calm, think aloud, state what you do know, and reason towards an answer. Honesty beats bluffing.</p></details>
+</section>
+
+<section id="contact">
+  <h2>Contact / Feedback</h2>
+  <p class="sub">Ask a doubt or suggest a resource.</p>
+  <form class="card" id="form" novalidate>
+    <input id="name" placeholder="Your name" aria-label="Name">
+    <input id="email" type="email" placeholder="Email" aria-label="Email">
+    <textarea id="text" rows="3" placeholder="Message"></textarea>
+    <button type="submit">Send</button>
+    <p class="msg" id="fmsg"></p>
+  </form>
+</section>
+
+<section id="ai">
+  <h2>AI Development Log</h2>
+  <p class="sub">How generative AI helped build this site.</p>
+  <div class="card">
+    <b>Prompts used</b>
+    <ol class="prompts">
+      <li>"Build a placement preparation portal as a single HTML file with sections for quiz, tracker, resources and FAQ."</li>
+      <li>"Make the layout responsive using CSS grid and flexbox, with a sticky navbar."</li>
+      <li>"Add a 5-question quiz in JavaScript with instant feedback and a score."</li>
+      <li>"Add a checklist with a progress bar saved using localStorage."</li>
+      <li>"Add category filter chips and a live search box for resources."</li>
+      <li>"Add dark mode with a toggle button."</li>
+      <li>"Add form validation for name, email and message."</li>
+      <li>"My progress bar does not update after reload – find the bug."</li>
+    </ol>
+    <b>Contribution of AI</b>
+    <p>AI generated the initial HTML structure, CSS layout and JavaScript logic; suggested the responsive grid and dark-mode colour tokens; helped debug the localStorage bug (storage read before the DOM was ready) and improved the UI with spacing and hover states. I tested every feature manually, edited the content, and adjusted questions and resources.</p>
+  </div>
+</section>
+
+<footer>© 2026 PlaceReady · Built with the help of Generative AI</footer>
+
+<script>
+const $=s=>document.querySelector(s);
+const store={get(k,d){try{const v=localStorage.getItem(k);return v===null?d:JSON.parse(v)}catch(e){return d}},
+set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}};
+
+// Theme
+const root=document.documentElement;
+$('#themeBtn').onclick=()=>{
+  const dark=getComputedStyle(root).getPropertyValue('--bg').trim()==='#12141f';
+  root.setAttribute('data-theme',dark?'light':'dark');store.set('theme',dark?'light':'dark');
+};
+const t=store.get('theme',null);if(t)root.setAttribute('data-theme',t);
+
+// Quiz
+const Q=[
+ {q:"A train 150 m long passes a pole in 15 s. Its speed is?",o:["8 m/s","10 m/s","12 m/s","15 m/s"],a:1},
+ {q:"Next number: 2, 6, 12, 20, 30, ?",o:["38","40","42","44"],a:2},
+ {q:"If 20% of x is 50, x = ?",o:["200","250","300","100"],a:1},
+ {q:"Time complexity of binary search?",o:["O(n)","O(log n)","O(n²)","O(1)"],a:1},
+ {q:"Which data structure uses LIFO?",o:["Queue","Array","Stack","Heap"],a:2}
+];
+let qi=0,score=0,locked=false;
+function showQ(){
+  const box=$('#quizBox');
+  if(qi>=Q.length){
+    const best=Math.max(score,store.get('best',0));store.set('best',best);$('#stQuiz').textContent=best+'/'+Q.length;
+    box.innerHTML=`<h3>Score: ${score}/${Q.length}</h3><p>${score>=4?'Excellent work! 🎉':score>=2?'Good, keep practising.':'Revise the basics and retry.'}</p><button id="retry">Retry</button>`;
+    $('#retry').onclick=()=>{qi=0;score=0;showQ()};return;
+  }
+  locked=false;const c=Q[qi];
+  box.innerHTML=`<small>Question ${qi+1} of ${Q.length}</small><h3>${c.q}</h3>`+
+    c.o.map((x,i)=>`<button class="opt" data-i="${i}">${x}</button>`).join('')+'<p class="msg" id="qmsg"></p>';
+  box.querySelectorAll('.opt').forEach(b=>b.onclick=()=>{
+    if(locked)return;locked=true;const i=+b.dataset.i;
+    box.querySelectorAll('.opt')[c.a].classList.add('right');
+    if(i===c.a){score++;$('#qmsg').textContent='Correct!'}else{b.classList.add('wrong');$('#qmsg').textContent='Not quite.'}
+    setTimeout(()=>{qi++;showQ()},1100);
+  });
+}
+showQ();
+const b=store.get('best',null);if(b!==null)$('#stQuiz').textContent=b+'/'+Q.length;
+
+// Tracker
+const TASKS=["Update resume","Solve 50 array/string problems","Revise DBMS, OS, CN basics","Practice aptitude 30 min daily","Build 2 solid projects","Do 3 mock interviews","Prepare HR answers","Create LinkedIn & GitHub profile"];
+let done=store.get('tasks',[]);
+function renderTasks(){
+  $('#tasks').innerHTML=TASKS.map((t,i)=>`<label class="task"><input type="checkbox" style="width:auto;margin:0" data-i="${i}" ${done.includes(i)?'checked':''}>${t}</label>`).join('');
+  document.querySelectorAll('#tasks input').forEach(c=>c.onchange=()=>{
+    const i=+c.dataset.i;done=c.checked?[...done,i]:done.filter(x=>x!==i);store.set('tasks',done);progress();
+  });progress();
+}
+function progress(){
+  const p=Math.round(done.length/TASKS.length*100);
+  $('#fill').style.width=p+'%';$('#pct').textContent=p+'% done';$('#stTask').textContent=p+'%';
+}
+$('#resetTasks').onclick=()=>{done=[];store.set('tasks',done);renderTasks()};
+renderTasks();
+
+// Resources
+const RES=[
+ {t:"Striver's DSA Sheet",c:"Coding",d:"Curated DSA problem list for interviews."},
+ {t:"LeetCode Top Interview 150",c:"Coding",d:"Most asked coding questions by topic."},
+ {t:"Quantitative Aptitude Basics",c:"Aptitude",d:"Percentages, ratios, time & work formulas."},
+ {t:"Logical Reasoning Practice",c:"Aptitude",d:"Series, puzzles, seating arrangement."},
+ {t:"CS Fundamentals Notes",c:"Core CS",d:"OS, DBMS, Computer Networks summaries."},
+ {t:"SQL Practice Problems",c:"Core CS",d:"Joins, group by and subqueries drills."},
+ {t:"HR Question Bank",c:"HR",d:"Common HR questions with sample answers."},
+ {t:"Resume Templates",c:"HR",d:"ATS-friendly one-page resume formats."}
+];
+let cat="All";
+const cats=["All",...new Set(RES.map(r=>r.c))];
+function renderRes(){
+  $('#chips').innerHTML=cats.map(c=>`<button class="chip ghost ${c===cat?'active':''}" data-c="${c}">${c}</button>`).join('');
+  document.querySelectorAll('.chip').forEach(b=>b.onclick=()=>{cat=b.dataset.c;renderRes()});
+  const s=$('#search').value.toLowerCase();
+  const list=RES.filter(r=>(cat==="All"||r.c===cat)&&(r.t+r.d).toLowerCase().includes(s));
+  $('#resGrid').innerHTML=list.length?list.map(r=>`<div class="card"><span class="tag">${r.c}</span><h3 style="margin:4px 0">${r.t}</h3><p style="color:var(--muted);margin:0">${r.d}</p></div>`).join(''):'<p>No resources found.</p>';
+}
+$('#search').oninput=renderRes;renderRes();
+
+// Form validation
+$('#form').onsubmit=e=>{
+  e.preventDefault();const m=$('#fmsg');
+  const n=$('#name').value.trim(),em=$('#email').value.trim(),tx=$('#text').value.trim();
+  if(n.length<2){m.className='msg err';m.textContent='Please enter your name.';return}
+  if(!/^\S+@\S+\.\S+$/.test(em)){m.className='msg err';m.textContent='Enter a valid email address.';return}
+  if(tx.length<10){m.className='msg err';m.textContent='Message must be at least 10 characters.';return}
+  m.className='msg good';m.textContent='Thanks '+n+'! Your message has been recorded.';e.target.reset();
+};
+</script>
+</body>
+</html>
